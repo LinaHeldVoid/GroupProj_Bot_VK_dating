@@ -10,7 +10,7 @@ import common_functions
 
 
 config = configparser.ConfigParser()
-config.read("TOKENS_DANGER.ini")
+config.read("token_list.ini")
 token = config['VK']['bot_token']
 
 session = vk_api.VkApi(token=token)
