@@ -17,3 +17,5 @@ user_id = 60185737
 bot_token = vk1.a.ElwoqeDg-Ua...
 ```
 #### файл token_list.ini после создания ОБЯЗАТЕЛЬНО!!! нужно добавить в файл .gitignore
+
+![image](https://user-images.githubusercontent.com/103646573/231222580-125dbb14-f2ee-4eb0-b530-03b61cf2562e.png)

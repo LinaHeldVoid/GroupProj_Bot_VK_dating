@@ -5,7 +5,6 @@ import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 
-import common_functions
 
 
 def kirillic_symbols():
@@ -14,8 +13,10 @@ def kirillic_symbols():
     return kirillic
 
 
+
 def write_msg(session, user_id, message, keyboard=None):
     params = {
+
         'user_id': user_id,
         'message': message,
         'random_id': random.randrange(10 ** 7),
@@ -25,7 +26,9 @@ def write_msg(session, user_id, message, keyboard=None):
     else:
         params = params
 
-    session.method('messages.send', params)
+
+    session.method("messages.send", params)
+
 
 
 def wrong_input(session, user_id):
@@ -194,6 +197,12 @@ def gender_choice(session, event, user_id):
             wrong_input(session, user_id)
             continue
         return gender
+
+
+        elif text.lower() == "пол не важен":
+            gender = "0"
+            location = location(user_id)
+            write_msg(user_id, f"Вы выбрали: пол не важен, город: {location}")
 
 
 def age_check_low(session, user_id):
