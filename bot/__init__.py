@@ -1,6 +1,1 @@
-from bot import (
-    body,
-    vk,
-    keyboard,
-    functions
-)
+__all__ = ["body", "functions", "keyboard", "vk"]
