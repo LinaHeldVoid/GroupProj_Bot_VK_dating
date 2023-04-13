@@ -6,4 +6,4 @@ def get_tokens():
     config.read("token_list.ini")
     token = config["VK"]["bot_token"]
     user_id = config["VK"]["user_id"]
-    return
+    return token, user_id

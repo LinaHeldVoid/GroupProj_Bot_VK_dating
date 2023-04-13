@@ -1,6 +1,6 @@
 import random
 from vk_api.longpoll import VkLongPoll, VkEventType
-from keyboard import *
+from bot.keyboard import *
 
 
 def kirillic_symbols(text):
