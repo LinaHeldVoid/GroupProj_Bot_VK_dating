@@ -5,18 +5,21 @@ import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 
+import common_functions
 
 
-def kirillic_symbols():
-    letters_permitted = ['АБВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя']
-    kirillic = set(letters_permitted)
-    return kirillic
-
+def kirillic_symbols(text):
+    letters_permitted = 'АБВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя '
+    kirillic = list(letters_permitted)
+    example = list(text)
+    for letter in example:
+        if letter not in kirillic:
+            return False
+    return True
 
 
 def write_msg(session, user_id, message, keyboard=None):
     params = {
-
         'user_id': user_id,
         'message': message,
         'random_id': random.randrange(10 ** 7),
@@ -26,63 +29,65 @@ def write_msg(session, user_id, message, keyboard=None):
     else:
         params = params
 
-
-    session.method("messages.send", params)
-
+    session.method('messages.send', params)
 
 
 def wrong_input(session, user_id):
     write_msg(session, user_id, 'Пожалуйста, выбери значение с кнопки, дорогуша.')
 
 
-def keyboard_1_generate():
-    keyboard_1 = VkKeyboard()
-    keyboard_1.add_button('Вперёд!', VkKeyboardColor.POSITIVE)
-    return keyboard_1
+def keyboard_hello_generate():
+    keyboard_hello = VkKeyboard()
+    keyboard_hello.add_button('Вперёд!', VkKeyboardColor.POSITIVE)
+    return keyboard_hello
 
 
-def keyboard_2_generate():
-    keyboard_2 = VkKeyboard()
-    keyboard_2.add_button('Парня', VkKeyboardColor.PRIMARY)
-    keyboard_2.add_line()
-    keyboard_2.add_button('Девушку', VkKeyboardColor.PRIMARY)
-    keyboard_2.add_line()
-    keyboard_2.add_button('Пол не важен', VkKeyboardColor.PRIMARY)
-    return keyboard_2
+def keyboard_gender_generate():
+    keyboard_gender = VkKeyboard()
+    keyboard_gender.add_button('Парня', VkKeyboardColor.PRIMARY)
+    keyboard_gender.add_line()
+    keyboard_gender.add_button('Девушку', VkKeyboardColor.PRIMARY)
+    keyboard_gender.add_line()
+    keyboard_gender.add_button('Пол не важен', VkKeyboardColor.PRIMARY)
+    return keyboard_gender
 
 
-def keyboard_3_generate():
-    keyboard_3 = VkKeyboard()
-    keyboard_3.add_button('Да! Добавь в Избранное', VkKeyboardColor.POSITIVE)
-    keyboard_3.add_line()
-    keyboard_3.add_button('Давай посмотрим ещё', VkKeyboardColor.PRIMARY)
-    keyboard_3.add_line()
-    keyboard_3.add_button('Нет. Больше не показывай', VkKeyboardColor.SECONDARY)
-    keyboard_3.add_line()
-    keyboard_3.add_button('Стоп', VkKeyboardColor.NEGATIVE)
-    keyboard_3.add_line()
-    return keyboard_3
+def keyboard_stupid_generate():
+    keyboard_stupid = VkKeyboard()
+    keyboard_stupid.add_button('Введи число с клавиатуры', VkKeyboardColor.SECONDARY)
+    return keyboard_stupid
 
 
-def keyboard_4_generate():
-    keyboard_4 = VkKeyboard()
-    keyboard_4.add_button('Страна не имеет значения', VkKeyboardColor.PRIMARY)
-    return keyboard_4
+def keyboard_discussion_generate():
+    keyboard_discussion = VkKeyboard()
+    keyboard_discussion.add_button('Да! Добавь в Избранное', VkKeyboardColor.POSITIVE)
+    keyboard_discussion.add_line()
+    keyboard_discussion.add_button('Давай посмотрим ещё', VkKeyboardColor.PRIMARY)
+    keyboard_discussion.add_line()
+    keyboard_discussion.add_button('Нет. Больше не показывай', VkKeyboardColor.SECONDARY)
+    keyboard_discussion.add_line()
+    keyboard_discussion.add_button('Стоп', VkKeyboardColor.NEGATIVE)
+    return keyboard_discussion
 
 
-def keyboard_5_generate():
-    keyboard_5 = VkKeyboard()
-    keyboard_5.add_button('Город не имеет значения', VkKeyboardColor.PRIMARY)
-    return keyboard_5
+def keyboard_country_generate():
+    keyboard_country = VkKeyboard()
+    keyboard_country.add_button('Страна не имеет значения', VkKeyboardColor.PRIMARY)
+    return keyboard_country
 
 
-def keyboard_6_generate():
-    keyboard_6 = VkKeyboard()
-    keyboard_6.add_button('Поищем ещё!', VkKeyboardColor.POSITIVE)
-    keyboard_6.add_line()
-    keyboard_6.add_button('Заканчивай', VkKeyboardColor.POSITIVE)
-    keyboard_6.add_line()
-    return keyboard_6
+def keyboard_city_generate():
+    keyboard_city = VkKeyboard()
+    keyboard_city.add_button('Город не имеет значения', VkKeyboardColor.PRIMARY)
+    return keyboard_city
+
+
+def keyboard_final_generate():
+    keyboard_final = VkKeyboard()
+    keyboard_final.add_button('Поищем ещё!', VkKeyboardColor.POSITIVE)
+    keyboard_final.add_line()
+    keyboard_final.add_button('Заканчивай', VkKeyboardColor.POSITIVE)
+    return keyboard_final
 
 
 def create_db():
@@ -171,121 +176,118 @@ def bot_next_reply():
     return reply
 
 
-def greetings(session, event, user_id):
-    write_msg(session, user_id, 'Добро пожаловать в наш бот для знакомств! '
-                                'Хочешь встретить свою судьбу?;)', keyboard_1_generate())
-    while True:
-        if event.text == 'Вперёд!':
-            create_db()
-            break
-        else:
-            wrong_input(session, user_id)
-            continue
+def greetings(session, user_id):
+    for event in VkLongPoll(session).listen():
+        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+            write_msg(session, user_id, 'Добро пожаловать в наш бот для знакомств! '
+                                        'Хочешь встретить свою судьбу?;)', keyboard_hello_generate())
+            return
 
 
-def gender_choice(session, event, user_id):
-    write_msg(session, user_id, 'Приступим! Кого ты желаешь найти?', keyboard_2_generate())
-    text = event.text
-    while True:
-        if text == 'Парня':
-            gender = 2
-        elif text == 'Девушку':
-            gender = 1
-        elif text == 'Пол не важен':
-            gender = 0
-        else:
-            wrong_input(session, user_id)
-            continue
-        return gender
+def start_bot(session, user_id):
+    for event in VkLongPoll(session).listen():
+        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+            if event.text == 'Вперёд!':
+                create_db()
+                return
+            else:
+                wrong_input(session, user_id)
 
 
-        elif text.lower() == "пол не важен":
-            gender = "0"
-            location = location(user_id)
-            write_msg(user_id, f"Вы выбрали: пол не важен, город: {location}")
+def gender_choice(session, user_id):
+    write_msg(session, user_id, 'Приступим! Кого ты желаешь найти?', keyboard_gender_generate())
+    for event in VkLongPoll(session).listen():
+        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+            text = event.text
+            if text == 'Парня':
+                gender = 2
+                return gender
+            elif text == 'Девушку':
+                gender = 1
+                return gender
+            elif text == 'Пол не важен':
+                gender = 0
+                return gender
+            else:
+                wrong_input(session, user_id)
 
 
 def age_check_low(session, user_id):
-    while True:
-        write_msg(session, user_id, 'Теперь поговорим про возраст партнёра.'
-                                    'Какая нижняя граница желаемого возраста?')
-        for event in VkLongPoll(session).listen():
-            if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                text = event.text
-                if text is not None:
-                    if text.isnumeric():
-                        if text >= 12:
-                            age_low = text
-                        else:
-                            write_msg(session, user_id, 'Извините, наш бот не может искать партнёров младше 12 лет.')
-                            continue
+    write_msg(session, user_id, 'Теперь поговорим про возраст партнёра. '
+                                'Какая нижняя граница желаемого возраста?', keyboard_stupid_generate())
+    for event in VkLongPoll(session).listen():
+        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+            text = event.text
+            if text is not None:
+                if text.isnumeric():
+                    text = int(text)
+                    if text >= 12:
+                        age_low = text
+                        return age_low
                     else:
-                        write_msg(session, user_id, 'Пожалуйста, введите ответ цифрой.')
-                        continue
+                        write_msg(session, user_id, 'Извини, наш бот не может искать партнёров младше 12 лет.')
                 else:
-                    write_msg(session, user_id, 'Пожалуйста, введите ответ.')
-                    continue
-                return age_low
+                    write_msg(session, user_id, 'Пожалуйста, введи ответ цифрой.')
+            else:
+                write_msg(session, user_id, 'Пожалуйста, введи ответ.')
 
 
-def age_check_high(session, user_id):
-    while True:
-        write_msg(session, user_id, 'Что насчёт верхней планки?')
-        for event in VkLongPoll(session).listen():
-            if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                text = event.text
-                if text is not None:
-                    if text.isnumeric():
+def age_check_high(session, user_id, age_low):
+    write_msg(session, user_id, 'Что насчёт верхней планки?', keyboard_stupid_generate())
+    for event in VkLongPoll(session).listen():
+        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+            text = event.text
+            if text is not None:
+                if text.isnumeric():
+                    text = int(text)
+                    if text <= age_low:
+                        write_msg(session, user_id, 'Бот умеет считать, дорогуша) '
+                                                    'Этот показатель должен быть БОЛЬШЕ, чем предыдущий.')
+                    else:
                         age_high = text
-                    else:
-                        write_msg(session, user_id, 'Пожалуйста, введите ответ цифрой.')
-                        continue
+                        return age_high
                 else:
-                    write_msg(session, user_id, 'Пожалуйста, введите ответ.')
-                    continue
-                return age_high
+                    write_msg(session, user_id, 'Пожалуйста, введи ответ цифрой.')
+            else:
+                write_msg(session, user_id, 'Пожалуйста, введи ответ.')
 
 
 def country_input(session, user_id):
-    while True:
-        write_msg(session, user_id, 'Отлично! В какой стране ищете вашего человека?', keyboard_4_generate())
-        for event in VkLongPoll(session).listen():
-            if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                text = event.text
-                if text is not None:
-                    if text in kirillic_symbols():
-                        if text == 'Страна не имеет значения':
-                            country = 0
-                        else:
-                            country = text
+    write_msg(session, user_id, 'Отлично! В какой стране ищете вашего человека?', keyboard_country_generate())
+    for event in VkLongPoll(session).listen():
+        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+            text = event.text
+            if text is not None:
+                if kirillic_symbols(text):
+                    if text == 'Страна не имеет значения':
+                        country = None
+                        return country
                     else:
-                        write_msg(session, user_id, 'Пожалуйста, введите ответ кириллицей.')
-                        continue
+                        country = text
+                        return country
                 else:
-                    write_msg(session, user_id, 'Пожалуйста, введите ответ.')
-                    continue
-                return country
+                    write_msg(session, user_id, 'Пожалуйста, введите ответ кириллицей.')
+            else:
+                write_msg(session, user_id, 'Пожалуйста, введите ответ.')
 
 
 def city_input(session, user_id):
-    while True:
-        write_msg(session, user_id, 'Теперь укажите желаемый город', keyboard_5_generate())
-        for event in VkLongPoll(session).listen():
-            if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                text = event.text
-                if text is not None:
-                    if text in kirillic_symbols():
-                        if text == 'Город не имеет значения':
-                            city = 0
-                        else:
-                            city = text
+    write_msg(session, user_id, 'Теперь укажите желаемый город', keyboard_city_generate())
+    for event in VkLongPoll(session).listen():
+        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+            text = event.text
+            if text is not None:
+                if kirillic_symbols(text):
+                    if text == 'Город не имеет значения':
+                        city = 0
+                        return city
                     else:
-                        write_msg(session, user_id, 'Пожалуйста, введите ответ кириллицей.')
-                        continue
+                        city = text
+                        return city
                 else:
-                    write_msg(session, user_id, 'Пожалуйста, введите ответ.')
-                    continue
-                return city
+                    write_msg(session, user_id, 'Пожалуйста, введи ответ кириллицей.')
+            else:
+                write_msg(session, user_id, 'Пожалуйста, введи ответ.')
 
 
 def search_partner_list(session, user_id, age_low, age_high, gender, country, city):
@@ -311,48 +313,43 @@ def discuss_candidates(session, user_id, candidate_list):
 
     """ВЫВОДИТСЯ РАНДОМНЫЙ ЧЕЛОВЕК ИЗ ВЫБОРКИ"""
 
-    write_msg(session, user_id, 'Начнём! Что думаешь об этом человеке?', keyboard_3_generate())
-    while True:
-        for event in VkLongPoll(session).listen():
-            if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                text = event.text
-                if text == 'Да! Добавь в Избранное':
-                    bot_satisfied_reply()
-                    save_to_favorites()
-                    bot_next_reply()
-                    random_person(candidate_list)
-                elif text == 'Давай посмотрим ещё':
-                    bot_neutral_reply()
-                    bot_next_reply()
-                    random_person(candidate_list)
-                    continue
-                elif text == 'Нет. Больше не показывай':
-                    bot_upset_reply()
-                    save_to_black_list()
-                    bot_next_reply()
-                    random_person(candidate_list)
-                    continue
-                elif text == 'Стоп':
-                    break
-                else:
-                    wrong_input(session, user_id)
-                    continue
+    write_msg(session, user_id, 'Начнём! Что думаешь об этом человеке?', keyboard_discussion_generate())
+    for event in VkLongPoll(session).listen():
+        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+            text = event.text
+            if text == 'Да! Добавь в Избранное':
+                bot_satisfied_reply()
+                save_to_favorites()
+                bot_next_reply()
+                random_person(candidate_list)
+            elif text == 'Давай посмотрим ещё':
+                bot_neutral_reply()
+                bot_next_reply()
+                random_person(candidate_list)
+            elif text == 'Нет. Больше не показывай':
+                bot_upset_reply()
+                save_to_black_list()
+                bot_next_reply()
+                random_person(candidate_list)
+            elif text == 'Стоп':
+                return
+            else:
+                wrong_input(session, user_id)
 
 
-def final_menu(session, user_id, candidate_list):
-    write_msg(session, user_id, 'Что хочешь делать сейчас, дорогуша?', keyboard_6_generate())
-    while True:
-        for event in VkLongPoll(session).listen():
-            if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                text = event.text
-                if text == 'Поищем ещё!':
-                    write_msg(session, user_id, 'Вот это настрой! Я в тебе не сомневалась)', keyboard_1_generate())
-                    discuss_candidates(session, user_id, candidate_list)
-                    decision = 1
-                elif text == 'Заканчивай':
-                    write_msg(session, user_id, 'Я поняла тебя! Дай знать, если захочешь вернуться;)', keyboard_1_generate())
-                    decision = 0
-                else:
-                    wrong_input(session, user_id)
-                    continue
+def final_menu(session, user_id):
+    write_msg(session, user_id, 'Что хочешь делать сейчас, дорогуша?', keyboard_final_generate())
+    for event in VkLongPoll(session).listen():
+        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+            text = event.text
+            if text == 'Поищем ещё!':
+                write_msg(session, user_id, 'Вот это настрой! Я в тебе не сомневалась)')
+                decision = 1
                 return decision
+            elif text == 'Заканчивай':
+                write_msg(session, user_id, 'Я поняла тебя! Дай знать, если захочешь вернуться;)',
+                          keyboard_hello_generate())
+                decision = 0
+                return decision
+            else:
+                wrong_input(session, user_id)
