@@ -1,6 +1,5 @@
 import configparser
 import vk_api
-from vk_api.longpoll import VkLongPoll, VkEventType
 import bot_functions
 
 config = configparser.ConfigParser()
@@ -40,7 +39,5 @@ def bot_body():
         bot_functions.discuss_candidates(session, user_id, candidate_list)
 
 
-
 if __name__ == '__main__':
     bot_body()
-
