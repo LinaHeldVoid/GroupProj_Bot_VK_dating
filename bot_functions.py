@@ -1,9 +1,6 @@
-import configparser
 import random
-
-import vk_api
-from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
+
 
 import common_functions
 
@@ -33,7 +30,7 @@ def write_msg(session, user_id, message, keyboard=None):
 
 
 def wrong_input(session, user_id):
-    write_msg(session, user_id, 'Пожалуйста, выбери значение с кнопки, дорогуша.')
+    write_msg(session, user_id, "Пожалуйста, выбери значение с кнопки, дорогуша.")
 
 
 def keyboard_hello_generate():
@@ -90,90 +87,37 @@ def keyboard_final_generate():
     return keyboard_final
 
 
-def create_db():
 
-    """ЗДЕСЬ ДОЛЖНА БЫТЬ ФУНКЦИЯ, СОЗДАЮЩАЯ ЯЧЕЙКУ ДЛЯ ПОЛЬЗОВАТЕЛЕ"""
+def create_db():
+    pass
 
 
 def save_to_favorites():
-
-    """ЗДЕСЬ ДОЛЖНА БЫТЬ ФУНКЦИЯ, СОХРАНЯЮЩАЯ ЧЕЛОВЕКА В ИЗБРАННЫЕ"""
+    pass
 
 
 def save_to_black_list():
-
-    """ЗДЕСЬ ДОЛЖНА БЫТЬ ФУНКЦИЯ, КИДАЮЩАЯ ЧЕЛОВЕКА В ЧС"""
-
-    """НЕ ЗАБУДЬТЕ УДАЛИТЬ ДАННЫЕ ИЗ CANDIDATES_LIST!!!"""
+    pass
 
 
 def clear_db():
-
-    """ЗДЕСЬ ДОЛЖНА БЫТЬ ФУНКЦИЯ, УДАЛЯЮЩАЯ ИНФОРМАЦИЮ ИЗ БД"""
+    pass
 
 
 def bot_satisfied_reply():
-    reply_list = [
-        'Одобряю, дорогуша!',
-        'Отличный выбор!',
-        'Как скажешь))',
-        'Не забудь написать своей паре!',
-        'У тебя отличный вкус!',
-        'Счастья молодым!',
-        'Позови на свадьбу:)'
-    ]
-    reply = random.choice(reply_list)
-    return reply
+    pass
 
 
 def bot_upset_reply():
-    reply_list = [
-        'Как жаль.',
-        'Как пожелаешь.',
-        'Ох. Хорошо, что человек не видит твоего ответа.',
-        'Окей, сделано.',
-        'Как жестоко(',
-        'Суровый вердикт.',
-        'Ладно-ладно.',
-        'Хозяин-барин.',
-        'Вредина('
-    ]
-    reply = random.choice(reply_list)
-    return reply
+    pass
 
 
 def bot_neutral_reply():
-    reply_list = [
-        'Ладно.',
-        'Окей!',
-        'Я поняла, посмотрим ещё)',
-        'Крутите барабан!',
-        'Оки-доки:)',
-        'Вредность твоя не знает границ ;)',
-        'Тебе не угодишь!',
-        'Хозяин-барин.',
-        'Как пожелаешь, величество)',
-        'Не то чтобы я запрограммирована уставать...'
-    ]
-    reply = random.choice(reply_list)
-    return reply
+    pass
 
 
 def bot_next_reply():
-    reply_list = [
-        'Что насчёт этого?',
-        'Полетели дальше!',
-        'Следующий претендент!',
-        'В студию!',
-        'Следующий кандидат!',
-        'Что тут у нас?',
-        'Вот ещё, например.',
-        'Что думаешь?',
-        'Что скажешь?',
-        'Каков твой вердикт?)'
-    ]
-    reply = random.choice(reply_list)
-    return reply
+    pass
 
 
 def greetings(session, user_id):
@@ -353,3 +297,4 @@ def final_menu(session, user_id):
                 return decision
             else:
                 wrong_input(session, user_id)
+

@@ -1,19 +1,12 @@
 import configparser
-from random import randrange
-import configparser
-
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
-
-
 import bot_functions
-
 
 config = configparser.ConfigParser()
 config.read("token_list.ini")
-token = config['VK']['bot_token']
-user_id = config['VK']['user_id']
-
+token = config.get("VK", "bot_token")
+user_id = config.get("VK", "user_id")
 session = vk_api.VkApi(token=token)
 
 
@@ -40,5 +33,14 @@ def bot_body():
         continue
 
 
+        decision = bot_functions.final_menu(session, user_id, candidate_list, event)
+        if not decision:
+            break
+
+        bot_functions.discuss_candidates(session, user_id, candidate_list)
+
+
+
 if __name__ == '__main__':
     bot_body()
+
