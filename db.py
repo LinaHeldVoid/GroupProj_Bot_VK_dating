@@ -20,6 +20,7 @@ def create_users_table(cur):
             city VARCHAR(50),
             favorit_id INT REFERENCES favorites(favorit_id),
             black_list_id INT REFERENCES black_list(black_list_id)
+            candidates_id INT REFERENCES candidates(candidates_id)
         )
     """
     )
@@ -48,8 +49,21 @@ def create_black_list_table(cur):
     """
     )
 
+# функция для создания таблицы candidates
+
+def create_candidates(cur):
+    cur.execute(
+        """
+        CREATE TABLE candidates (
+            candidates_id SERIAL PRIMARY KEY,
+            vk_link VARCHAR(100)
+        )
+    """
+    )
+
 
 if __name__ == "__main__":
     create_favorites_table()
     create_black_list_table()
     create_users_table()
+    create_candidates()
