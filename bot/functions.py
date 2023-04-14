@@ -1,11 +1,12 @@
 import random
 from vk_api.longpoll import VkLongPoll, VkEventType
 from bot.keyboard import *
+from db.db_functions import *
 
 
 def kirillic_symbols(text):
     letters_permitted = (
-        "АБВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя "
+        "АБВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя"
     )
     kirillic = list(letters_permitted)
     example = list(text)
@@ -256,35 +257,3 @@ def final_menu(session, user_id):
                 return decision
             else:
                 wrong_input(session, user_id)
-
-
-def create_db():
-    pass
-
-
-def save_to_favorites():
-    pass
-
-
-def save_to_black_list():
-    pass
-
-
-def clear_db():
-    pass
-
-
-def bot_satisfied_reply():
-    pass
-
-
-def bot_upset_reply():
-    pass
-
-
-def bot_neutral_reply():
-    pass
-
-
-def bot_next_reply():
-    pass

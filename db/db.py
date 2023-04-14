@@ -62,8 +62,8 @@ def create_candidates(cur):
     )
 
 
-if __name__ == "__main__":
-    create_favorites_table()
-    create_black_list_table()
-    create_users_table()
-    create_candidates()
+# if __name__ == "__main__":
+#     create_favorites_table()
+#     create_black_list_table()
+#     create_users_table()
+#     create_candidates()

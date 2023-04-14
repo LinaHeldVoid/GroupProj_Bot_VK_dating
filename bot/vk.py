@@ -1,5 +1,5 @@
 import requests
-from data.config import token
+from data.token_list import bot_token as token
 
 
 def get_country_id(country_name):

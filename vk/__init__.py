@@ -1,1 +1,1 @@
-from vk import user_info, search_function, getcityindex, take_photo
+__all__ = ['user_information']
