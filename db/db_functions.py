@@ -1,7 +1,7 @@
 import psycopg2
 from psycopg2 import Error
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-from db.db import create_tables
+from db.db import vkinder_bd
 
 
 def create_db():
@@ -13,6 +13,27 @@ def create_db():
         cursor = conn.cursor()
         sql_create_database = "create database VKinder"
         cursor.execute(sql_create_database)
+
+    except (Exception, Error) as error:
+        print("Ошибка при работе с PostgreSQL", error)
+    finally:
+        if conn:
+            cursor.close()
+            conn.close()
+            print("Соединение с PostgreSQL закрыто")
+
+
+def create_table():
+    try:
+        conn = psycopg2.connect(
+            host="localhost", user="postgres",
+            password="postgres", port=5432,
+            database="vkinder"
+        )
+        cursor = conn.cursor()
+        cursor.execute(vkinder_bd)
+        conn.commit()
+        print("Таблица успешно создана в PostgreSQL")
 
     except (Exception, Error) as error:
         print("Ошибка при работе с PostgreSQL", error)

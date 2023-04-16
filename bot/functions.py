@@ -50,6 +50,7 @@ def greetings(session, user_id):
 
 def start_bot(session, user_id):
     create_db()
+    create_table()
     for event in VkLongPoll(session).listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
             if event.text == "Вперёд!":
