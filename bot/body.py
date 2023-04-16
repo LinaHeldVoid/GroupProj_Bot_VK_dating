@@ -1,4 +1,4 @@
-from bot.functions import greetings
+from bot.functions import *
 from vk.search_candidates import search_partner_list
 
 

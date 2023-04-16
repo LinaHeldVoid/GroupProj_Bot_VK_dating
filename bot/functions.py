@@ -2,16 +2,7 @@ import random
 from vk_api.longpoll import VkLongPoll, VkEventType
 from bot.keyboard import *
 from db.db_functions import *
-from vk.search_candidates import search_partner_list
 
-import psycopg2
-
-conn = psycopg2.connect(
-    host="host", user="postgres", password="postgres", database="VKinder"
-)
-cur = conn.cursor()
-
-##########################
 
 
 def kirillic_symbols(text):
@@ -60,8 +51,8 @@ def greetings(session, user_id):
 def start_bot(session, user_id):
     for event in VkLongPoll(session).listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+            create_db()
             if event.text == "Вперёд!":
-                create_db()
                 return
             else:
                 wrong_input(session, user_id)
