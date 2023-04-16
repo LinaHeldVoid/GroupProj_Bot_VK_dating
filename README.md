@@ -23,4 +23,5 @@ bot_token = 'vk1.a.ElwoqeDg-Ua...' # и даже тут кавычки
 
 
 #### А вот тут, красивая схема нашей БД:
+
 ![image](https://user-images.githubusercontent.com/103646573/231471857-4f77808f-b150-47af-83ec-8f147bfd5ba8.png)
