@@ -49,9 +49,9 @@ def greetings(session, user_id):
 
 
 def start_bot(session, user_id):
+    create_db()
     for event in VkLongPoll(session).listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            create_db()
             if event.text == "Вперёд!":
                 return
             else:

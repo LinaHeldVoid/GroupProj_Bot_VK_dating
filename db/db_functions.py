@@ -1,31 +1,26 @@
 import psycopg2
+from psycopg2 import Error
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from db.db import create_tables
 
 
 def create_db():
-    conn = psycopg2.connect(
-        host="localhost",
-        database="postgres",
-        user="postgres",
-        password="postgres",
-        port=5432
-    )
-    conn.autocommit = True
-    with conn.cursor() as cur:
-        # Проверяем наличие базы данных
-        cur.execute("SELECT 1 FROM pg_database WHERE datname = 'VKinder'")
-        exists = cur.fetchone()
-        if exists:
-            print('База данных уже существует')
-        else:
-            # Создаем базу данных
-            cur.execute("CREATE DATABASE VKinder")
-    conn.autocommit = False
-    create_tables(conn)
-    conn.close()
+    try:
+        conn = psycopg2.connect(
+            host="localhost", user="postgres", password="postgres", port=5432
+        )
+        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cursor = conn.cursor()
+        sql_create_database = "create database VKinder"
+        cursor.execute(sql_create_database)
 
-
-
+    except (Exception, Error) as error:
+        print("Ошибка при работе с PostgreSQL", error)
+    finally:
+        if conn:
+            cursor.close()
+            conn.close()
+            print("Соединение с PostgreSQL закрыто")
 
 
 def save_to_favorites():
