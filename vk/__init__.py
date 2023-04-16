@@ -1,1 +1,1 @@
-__all__ = ['user_information']
+__all__ = ['user_information', 'search_candidates']
