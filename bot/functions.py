@@ -2,6 +2,16 @@ import random
 from vk_api.longpoll import VkLongPoll, VkEventType
 from bot.keyboard import *
 from db.db_functions import *
+from vk.search_candidates import search_partner_list
+
+import psycopg2
+
+conn = psycopg2.connect(
+    host="host", user="postgres", password="postgres", database="VKinder"
+)
+cur = conn.cursor()
+
+##########################
 
 
 def kirillic_symbols(text):
@@ -180,17 +190,9 @@ def city_input(session, user_id):
                 write_msg(session, user_id, "Пожалуйста, введи ответ.")
 
 
-def search_partner_list(session, user_id, age_low, age_high, gender, country, city):
-    age_low = age_low
-    age_high = age_high
-    gender = gender
-    country = country
-    city = city
+"""ЗДЕСЬ АКТИВИРУЕТСЯ ПОИСК (см. VK.search_candidates)"""
 
-    """ЗДЕСЬ АКТИВИРУЕТСЯ ПОИСК"""
 
-    candidate_list = []
-    return candidate_list
 
 
 def random_person(candidate_list):

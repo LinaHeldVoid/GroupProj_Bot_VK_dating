@@ -1,7 +1,22 @@
+import psycopg2
+from db.db import create_tables
 
 
 def create_db():
-    pass
+    with psycopg2.connect(
+            host="localhost",
+            database="postgres",
+            user="postgres",
+            password="postgres",
+            port=5432
+    ) as conn:
+        conn.autocommit = True
+        with conn.cursor() as cur:
+            cur.execute("CREATE DATABASE VKinder")
+        conn.autocommit = False
+        create_tables(conn)
+
+    conn.close()
 
 
 def save_to_favorites():

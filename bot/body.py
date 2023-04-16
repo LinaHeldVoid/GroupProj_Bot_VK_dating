@@ -1,4 +1,5 @@
-from bot.functions import *
+from bot.functions import greetings
+from vk.search_candidates import search_partner_list
 
 
 def bot_body(session, user_id):
