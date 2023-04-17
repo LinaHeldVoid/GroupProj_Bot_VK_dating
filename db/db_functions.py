@@ -26,9 +26,11 @@ def create_db():
 def create_table():
     try:
         conn = psycopg2.connect(
-            host="localhost", user="postgres",
-            password="postgres", port=5432,
-            database="vkinder"
+            host="localhost",
+            user="postgres",
+            password="postgres",
+            port=5432,
+            database="vkinder",
         )
         cursor = conn.cursor()
         cursor.execute(vkinder_bd)

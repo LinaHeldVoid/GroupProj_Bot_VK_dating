@@ -25,4 +25,3 @@ CREATE TABLE users (
     candidates_id INT REFERENCES candidates(candidates_id)
 );
 """
-

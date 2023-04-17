@@ -4,7 +4,6 @@ from bot.keyboard import *
 from db.db_functions import *
 
 
-
 def kirillic_symbols(text):
     letters_permitted = (
         "АБВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя"
@@ -185,13 +184,14 @@ def city_input(session, user_id):
 """ЗДЕСЬ АКТИВИРУЕТСЯ ПОИСК (см. VK.search_candidates)"""
 
 
-
-
 def random_person(candidate_list):
     candidate = random.choice(candidate_list)
     return candidate
 
+
 """ВЫВОДИТСЯ РАНДОМНЫЙ ЧЕЛОВЕК ИЗ ВЫБОРКИ"""
+
+
 def discuss_candidates(session, user_id):
     conn = psycopg2.connect(
         host="localhost", user="postgres", password="postgres", database="vkinder"
@@ -212,7 +212,9 @@ def discuss_candidates(session, user_id):
                 bot_satisfied_reply()
                 save_to_favorites()
                 bot_next_reply()
-                cur.execute("DELETE FROM candidates WHERE vk_link = %s", (candidate_link,))
+                cur.execute(
+                    "DELETE FROM candidates WHERE vk_link = %s", (candidate_link,)
+                )
                 conn.commit()
                 cur.execute("SELECT vk_link FROM candidates ORDER BY random() LIMIT 1")
                 candidate_link = cur.fetchone()[0]
@@ -225,7 +227,9 @@ def discuss_candidates(session, user_id):
             elif text == "Давай посмотрим ещё":
                 bot_neutral_reply()
                 bot_next_reply()
-                cur.execute("DELETE FROM candidates WHERE vk_link = %s", (candidate_link,))
+                cur.execute(
+                    "DELETE FROM candidates WHERE vk_link = %s", (candidate_link,)
+                )
                 conn.commit()
                 cur.execute("SELECT vk_link FROM candidates ORDER BY random() LIMIT 1")
                 candidate_link = cur.fetchone()[0]
@@ -239,7 +243,9 @@ def discuss_candidates(session, user_id):
                 bot_upset_reply()
                 save_to_black_list()
                 bot_next_reply()
-                cur.execute("DELETE FROM candidates WHERE vk_link = %s", (candidate_link,))
+                cur.execute(
+                    "DELETE FROM candidates WHERE vk_link = %s", (candidate_link,)
+                )
                 conn.commit()
                 cur.execute("SELECT vk_link FROM candidates ORDER BY random() LIMIT 1")
                 candidate_link = cur.fetchone()[0]
@@ -254,38 +260,9 @@ def discuss_candidates(session, user_id):
             else:
                 wrong_input(session, user_id)
 
-# def discuss_candidates(session, user_id, candidate_list):
-#     candidate_list = candidate_list
+
 #
-#
-#
-#     write_msg(
-#         session,
-#         user_id,
-#         "Начнём! Что думаешь об этом человеке?",
-#         keyboard_discussion_generate(),
-#     )
-#     for event in VkLongPoll(session).listen():
-#         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-#             text = event.text
-#             if text == "Да! Добавь в Избранное":
-#                 bot_satisfied_reply()
-#                 save_to_favorites()
-#                 bot_next_reply()
-#                 random_person(candidate_list)
-#             elif text == "Давай посмотрим ещё":
-#                 bot_neutral_reply()
-#                 bot_next_reply()
-#                 random_person(candidate_list)
-#             elif text == "Нет. Больше не показывай":
-#                 bot_upset_reply()
-#                 save_to_black_list()
-#                 bot_next_reply()
-#                 random_person(candidate_list)
-#             elif text == "Стоп":
-#                 return
-#             else:
-#                 wrong_input(session, user_id)
+
 
 def final_menu(session, user_id):
     write_msg(
