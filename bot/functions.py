@@ -120,7 +120,7 @@ def age_check_high(session, user_id, age_low):
             if text is not None:
                 if text.isnumeric():
                     text = int(text)
-                    if text <= age_low:
+                    if text < age_low:
                         write_msg(
                             session,
                             user_id,
@@ -259,9 +259,6 @@ def discuss_candidates(session, user_id):
                 return
             else:
                 wrong_input(session, user_id)
-
-
-#
 
 
 def final_menu(session, user_id):

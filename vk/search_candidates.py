@@ -21,9 +21,6 @@ def search_partner_list(session, user_id, age_low, age_high, gender, country, ci
     country = country
     city = city
     sex = 1 if gender_FM0 == 1 else 2
-    ###########################
-    print(f"sex: {sex}, gender{gender}, age_low{age_low}, age_high{age_high}")
-    #######################
     # Определяем город
     city_id = vk.database.getCities(country_id=1, q=city)["items"][0]["id"]
     # Определяем возрастные ограничения для поиска
