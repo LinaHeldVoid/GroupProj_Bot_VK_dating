@@ -73,7 +73,7 @@ def search_partner_list(session, user_id, age_low, age_high, gender, country, ci
             INSERT INTO candidates (vk_link)
             VALUES (%s)
             """,
-            (f"<https://vk.com/id{candidate['id']}>",)
+            (f"https://vk.com/id{candidate['id']}",)
         )
     conn.commit()
 

@@ -14,7 +14,7 @@ def bot_body(session, user_id):
         candidate_list = search_partner_list(
             session, user_id, age_low, age_high, gender, country, city
         )
-        discuss_candidates(session, user_id, candidate_list)
+        discuss_candidates(session, user_id)
         while True:
             decision = final_menu(session, user_id)
             if decision:

@@ -191,16 +191,18 @@ def random_person(candidate_list):
     candidate = random.choice(candidate_list)
     return candidate
 
-
-def discuss_candidates(session, user_id, candidate_list):
-    candidate_list = candidate_list
-
-    """ВЫВОДИТСЯ РАНДОМНЫЙ ЧЕЛОВЕК ИЗ ВЫБОРКИ"""
-
+"""ВЫВОДИТСЯ РАНДОМНЫЙ ЧЕЛОВЕК ИЗ ВЫБОРКИ"""
+def discuss_candidates(session, user_id):
+    conn = psycopg2.connect(
+        host="localhost", user="postgres", password="postgres", database="vkinder"
+    )
+    cur = conn.cursor()
+    cur.execute("SELECT vk_link FROM candidates ORDER BY random() LIMIT 1")
+    candidate_link = cur.fetchone()[0]
     write_msg(
         session,
         user_id,
-        "Начнём! Что думаешь об этом человеке?",
+        f"Начнём! Что думаешь об этом человеке?\n{candidate_link}",
         keyboard_discussion_generate(),
     )
     for event in VkLongPoll(session).listen():
@@ -210,21 +212,80 @@ def discuss_candidates(session, user_id, candidate_list):
                 bot_satisfied_reply()
                 save_to_favorites()
                 bot_next_reply()
-                random_person(candidate_list)
+                cur.execute("DELETE FROM candidates WHERE vk_link = %s", (candidate_link,))
+                conn.commit()
+                cur.execute("SELECT vk_link FROM candidates ORDER BY random() LIMIT 1")
+                candidate_link = cur.fetchone()[0]
+                write_msg(
+                    session,
+                    user_id,
+                    f"Что думаешь об этом человеке?\n{candidate_link}",
+                    keyboard_discussion_generate(),
+                )
             elif text == "Давай посмотрим ещё":
                 bot_neutral_reply()
                 bot_next_reply()
-                random_person(candidate_list)
+                cur.execute("DELETE FROM candidates WHERE vk_link = %s", (candidate_link,))
+                conn.commit()
+                cur.execute("SELECT vk_link FROM candidates ORDER BY random() LIMIT 1")
+                candidate_link = cur.fetchone()[0]
+                write_msg(
+                    session,
+                    user_id,
+                    f"Что думаешь об этом человеке?\n{candidate_link}",
+                    keyboard_discussion_generate(),
+                )
             elif text == "Нет. Больше не показывай":
                 bot_upset_reply()
                 save_to_black_list()
                 bot_next_reply()
-                random_person(candidate_list)
+                cur.execute("DELETE FROM candidates WHERE vk_link = %s", (candidate_link,))
+                conn.commit()
+                cur.execute("SELECT vk_link FROM candidates ORDER BY random() LIMIT 1")
+                candidate_link = cur.fetchone()[0]
+                write_msg(
+                    session,
+                    user_id,
+                    f"Что думаешь об этом человеке?\n{candidate_link}",
+                    keyboard_discussion_generate(),
+                )
             elif text == "Стоп":
                 return
             else:
                 wrong_input(session, user_id)
 
+# def discuss_candidates(session, user_id, candidate_list):
+#     candidate_list = candidate_list
+#
+#
+#
+#     write_msg(
+#         session,
+#         user_id,
+#         "Начнём! Что думаешь об этом человеке?",
+#         keyboard_discussion_generate(),
+#     )
+#     for event in VkLongPoll(session).listen():
+#         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+#             text = event.text
+#             if text == "Да! Добавь в Избранное":
+#                 bot_satisfied_reply()
+#                 save_to_favorites()
+#                 bot_next_reply()
+#                 random_person(candidate_list)
+#             elif text == "Давай посмотрим ещё":
+#                 bot_neutral_reply()
+#                 bot_next_reply()
+#                 random_person(candidate_list)
+#             elif text == "Нет. Больше не показывай":
+#                 bot_upset_reply()
+#                 save_to_black_list()
+#                 bot_next_reply()
+#                 random_person(candidate_list)
+#             elif text == "Стоп":
+#                 return
+#             else:
+#                 wrong_input(session, user_id)
 
 def final_menu(session, user_id):
     write_msg(
