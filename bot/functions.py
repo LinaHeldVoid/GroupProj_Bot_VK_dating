@@ -197,12 +197,17 @@ def discuss_candidates(session, user_id):
         host="localhost", user="postgres", password="postgres", database="vkinder"
     )
     cur = conn.cursor()
-    cur.execute("SELECT vk_link FROM candidates ORDER BY random() LIMIT 1")
-    candidate_link = cur.fetchone()[0]
+    cur.execute("SELECT first_name, last_name, photo, vk_link FROM people_found ORDER BY random() LIMIT 1")
+    candidate_data = cur.fetchone()
+    fname = candidate_data[0]
+    lname = candidate_data[1]
+    photo_link = candidate_data[2]
+    link = candidate_data[3]
+    message = f"{fname} {lname}\n<img src='{photo_link}'/>\n{link}"
     write_msg(
         session,
         user_id,
-        f"Начнём! Что думаешь об этом человеке?\n{candidate_link}",
+        f"Начнём! Что думаешь об этом человеке?\n{message}",
         keyboard_discussion_generate(),
     )
     for event in VkLongPoll(session).listen():
@@ -216,7 +221,7 @@ def discuss_candidates(session, user_id):
                     "DELETE FROM candidates WHERE vk_link = %s", (candidate_link,)
                 )
                 conn.commit()
-                cur.execute("SELECT vk_link FROM candidates ORDER BY random() LIMIT 1")
+                cur.execute("SELECT first_name, last_name, photo, vk_link FROM people_found ORDER BY random() LIMIT 1")
                 candidate_link = cur.fetchone()[0]
                 write_msg(
                     session,
@@ -231,7 +236,7 @@ def discuss_candidates(session, user_id):
                     "DELETE FROM candidates WHERE vk_link = %s", (candidate_link,)
                 )
                 conn.commit()
-                cur.execute("SELECT vk_link FROM candidates ORDER BY random() LIMIT 1")
+                cur.execute("SELECT first_name, last_name, photo, vk_link FROM people_found ORDER BY random() LIMIT 1")
                 candidate_link = cur.fetchone()[0]
                 write_msg(
                     session,
@@ -247,7 +252,7 @@ def discuss_candidates(session, user_id):
                     "DELETE FROM candidates WHERE vk_link = %s", (candidate_link,)
                 )
                 conn.commit()
-                cur.execute("SELECT vk_link FROM candidates ORDER BY random() LIMIT 1")
+                cur.execute("SELECT first_name, last_name, photo, vk_link FROM people_found ORDER BY random() LIMIT 1")
                 candidate_link = cur.fetchone()[0]
                 write_msg(
                     session,

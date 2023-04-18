@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from data.token_list import access_token as token
 import psycopg2
 import vk_api
@@ -9,8 +11,8 @@ def search_partner_list(session, user_id, age_low, age_high, gender, country, ci
     )
     cur = conn.cursor()
 
-    # Удаляем все записи из таблицы candidates / обнуляем таблицу перед новым поиском
-    cur.execute("DELETE FROM candidates")
+    # Удаляем все записи из таблицы people_found / обнуляем таблицу перед новым поиском
+    cur.execute("DELETE FROM people_found")
     conn.commit()
 
     session = vk_api.VkApi(token=token)
@@ -23,6 +25,7 @@ def search_partner_list(session, user_id, age_low, age_high, gender, country, ci
     sex = 1 if gender_FM0 == 1 else 2
     # Определяем город
     city_id = vk.database.getCities(country_id=1, q=city)["items"][0]["id"]
+    pprint(city_id)
     # Определяем возрастные ограничения для поиска
     age_from = age_low
     age_to = age_high
@@ -78,10 +81,11 @@ def search_partner_list(session, user_id, age_low, age_high, gender, country, ci
     for candidate in candidate_list:
         cur.execute(
             """
-            INSERT INTO candidates (vk_link)
-            VALUES (%s)
+            INSERT INTO people_found (first_name, last_name, photo, vk_id, vk_link)
+            VALUES (%s, %s, %s, %s, %s)
             """,
-            (f"https://vk.com/id{candidate['id']}",),
+            (candidate["first_name"], candidate["last_name"], f'{candidate["photo"]}', candidate["id"],
+             f"https://vk.com/id{candidate['id']}",),
         )
     conn.commit()
 
