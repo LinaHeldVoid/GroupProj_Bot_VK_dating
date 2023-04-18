@@ -5,7 +5,6 @@
 #### вот содержание этого файла (и немного изменил структуру):
 #### вот так выглядит. А лежит теперь тут: data/token_list.py
 
-![Image alt](https://raw.githubusercontent.com/astralista/pics/main/tokens.png?token=GHSAT0AAAAAACAHOFQYQTGOSHYNTCZJTW5EZBYO7TQ)
 
 ```
 # [VK] - этого больше нет
@@ -24,4 +23,4 @@ bot_token = 'vk1.a.ElwoqeDg-Ua...' # и даже тут кавычки
 
 #### А вот тут, красивая схема нашей БД:
 
-![image](https://user-images.githubusercontent.com/103646573/231471857-4f77808f-b150-47af-83ec-8f147bfd5ba8.png)
+![DB.png](data%2FDB.png)
