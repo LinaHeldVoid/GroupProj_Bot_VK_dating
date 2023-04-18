@@ -190,6 +190,14 @@ def random_person(candidate_list):
 
 
 """ВЫВОДИТСЯ РАНДОМНЫЙ ЧЕЛОВЕК ИЗ ВЫБОРКИ"""
+def generate_candidate_message(cur):
+    cur.execute("SELECT first_name, last_name, photo, vk_link FROM people_found ORDER BY random() LIMIT 1")
+    candidate_data = cur.fetchone()
+    fname = candidate_data[0]
+    lname = candidate_data[1]
+    photo_link = candidate_data[2]
+    link = candidate_data[3]
+    return f"{fname} {lname}\n<img src='{photo_link}'/>\n{link}"
 
 
 def discuss_candidates(session, user_id):
@@ -197,13 +205,7 @@ def discuss_candidates(session, user_id):
         host="localhost", user="postgres", password="postgres", database="vkinder"
     )
     cur = conn.cursor()
-    cur.execute("SELECT first_name, last_name, photo, vk_link FROM people_found ORDER BY random() LIMIT 1")
-    candidate_data = cur.fetchone()
-    fname = candidate_data[0]
-    lname = candidate_data[1]
-    photo_link = candidate_data[2]
-    link = candidate_data[3]
-    message = f"{fname} {lname}\n<img src='{photo_link}'/>\n{link}"
+    message = generate_candidate_message(cur)
     write_msg(
         session,
         user_id,
@@ -221,12 +223,11 @@ def discuss_candidates(session, user_id):
                     "DELETE FROM candidates WHERE vk_link = %s", (candidate_link,)
                 )
                 conn.commit()
-                cur.execute("SELECT first_name, last_name, photo, vk_link FROM people_found ORDER BY random() LIMIT 1")
-                candidate_link = cur.fetchone()[0]
+                message = generate_candidate_message(cur)
                 write_msg(
                     session,
                     user_id,
-                    f"Что думаешь об этом человеке?\n{candidate_link}",
+                    f"Что думаешь об этом человеке?\n{message}",
                     keyboard_discussion_generate(),
                 )
             elif text == "Давай посмотрим ещё":
@@ -236,12 +237,11 @@ def discuss_candidates(session, user_id):
                     "DELETE FROM candidates WHERE vk_link = %s", (candidate_link,)
                 )
                 conn.commit()
-                cur.execute("SELECT first_name, last_name, photo, vk_link FROM people_found ORDER BY random() LIMIT 1")
-                candidate_link = cur.fetchone()[0]
+                message = generate_candidate_message(cur)
                 write_msg(
                     session,
                     user_id,
-                    f"Что думаешь об этом человеке?\n{candidate_link}",
+                    f"Что думаешь об этом человеке?\n{message}",
                     keyboard_discussion_generate(),
                 )
             elif text == "Нет. Больше не показывай":
@@ -252,18 +252,18 @@ def discuss_candidates(session, user_id):
                     "DELETE FROM candidates WHERE vk_link = %s", (candidate_link,)
                 )
                 conn.commit()
-                cur.execute("SELECT first_name, last_name, photo, vk_link FROM people_found ORDER BY random() LIMIT 1")
-                candidate_link = cur.fetchone()[0]
+                message = generate_candidate_message(cur)
                 write_msg(
                     session,
                     user_id,
-                    f"Что думаешь об этом человеке?\n{candidate_link}",
+                    f"Что думаешь об этом человеке?\n{message}",
                     keyboard_discussion_generate(),
                 )
             elif text == "Стоп":
                 return
             else:
                 wrong_input(session, user_id)
+
 
 
 def final_menu(session, user_id):
