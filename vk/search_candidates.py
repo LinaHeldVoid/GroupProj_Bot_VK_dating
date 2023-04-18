@@ -84,8 +84,13 @@ def search_partner_list(session, user_id, age_low, age_high, gender, country, ci
             INSERT INTO people_found (first_name, last_name, photo, vk_id, vk_link)
             VALUES (%s, %s, %s, %s, %s)
             """,
-            (candidate["first_name"], candidate["last_name"], f'{candidate["photo"]}', candidate["id"],
-             f"https://vk.com/id{candidate['id']}",),
+            (
+                candidate["first_name"],
+                candidate["last_name"],
+                f'{candidate["photo"]}',
+                candidate["id"],
+                f"https://vk.com/id{candidate['id']}",
+            ),
         )
     conn.commit()
 

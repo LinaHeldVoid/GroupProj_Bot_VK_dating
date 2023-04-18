@@ -190,8 +190,12 @@ def random_person(candidate_list):
 
 
 """ВЫВОДИТСЯ РАНДОМНЫЙ ЧЕЛОВЕК ИЗ ВЫБОРКИ"""
+
+
 def generate_candidate_message(cur):
-    cur.execute("SELECT first_name, last_name, photo, vk_link FROM people_found ORDER BY random() LIMIT 1")
+    cur.execute(
+        "SELECT first_name, last_name, photo, vk_link FROM people_found ORDER BY random() LIMIT 1"
+    )
     candidate_data = cur.fetchone()
     fname = candidate_data[0]
     lname = candidate_data[1]
@@ -263,7 +267,6 @@ def discuss_candidates(session, user_id):
                 return
             else:
                 wrong_input(session, user_id)
-
 
 
 def final_menu(session, user_id):
