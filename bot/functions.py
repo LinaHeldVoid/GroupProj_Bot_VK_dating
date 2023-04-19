@@ -202,8 +202,7 @@ def generate_candidate_message(cur):
     lname = candidate_data[1]
     photo_link = candidate_data[2]
     link = candidate_data[3]
-    return f"{fname} {lname}\n<img src='{photo_link}'/>\n{link}"
-
+    return f"{fname} {lname}\n{photo_link}\n\n{link}"
 
 async def discuss_candidates(session, user_id):
     conn = psycopg2.connect(
@@ -225,7 +224,7 @@ async def discuss_candidates(session, user_id):
                 save_to_favorites()
                 bot_next_reply()
                 cur.execute(
-                    "DELETE FROM candidates WHERE vk_link = %s", (candidate_link,)
+                    "DELETE FROM people_found WHERE vk_link = %s", (message,)
                 )
                 conn.commit()
                 message = generate_candidate_message(cur)
@@ -239,7 +238,7 @@ async def discuss_candidates(session, user_id):
                 bot_neutral_reply()
                 bot_next_reply()
                 cur.execute(
-                    "DELETE FROM candidates WHERE vk_link = %s", (candidate_link,)
+                    "DELETE FROM people_found WHERE vk_link = %s", (message,)
                 )
                 conn.commit()
                 message = generate_candidate_message(cur)
@@ -254,7 +253,7 @@ async def discuss_candidates(session, user_id):
                 save_to_black_list()
                 bot_next_reply()
                 cur.execute(
-                    "DELETE FROM candidates WHERE vk_link = %s", (candidate_link,)
+                    "DELETE FROM people_found WHERE vk_link = %s", (message,)
                 )
                 conn.commit()
                 message = generate_candidate_message(cur)
