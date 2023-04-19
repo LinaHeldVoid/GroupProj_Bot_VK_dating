@@ -204,6 +204,7 @@ def generate_candidate_message(cur):
     link = candidate_data[3]
     return f"{fname} {lname}\n{photo_link}\n\n{link}"
 
+
 async def discuss_candidates(session, user_id):
     conn = psycopg2.connect(
         host="localhost", user="postgres", password="postgres", database="vkinder"
@@ -283,6 +284,11 @@ def final_menu(session, user_id):
                 write_msg(session, user_id, "Вот это настрой! Я в тебе не сомневалась)")
                 decision = 1
                 return decision
+            elif text == "Покажи моих Избранных":
+                write_msg(session, user_id, "ЗДЕСЬ МОГЛИ БЫТЬ ВАШИ ИЗБРАННЫЕ)))")
+
+                '''Далее будет команда для вывода избранных'''
+
             elif text == "Заканчивай":
                 write_msg(
                     session,

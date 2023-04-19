@@ -53,5 +53,7 @@ def keyboard_final_generate():
     keyboard_final = VkKeyboard()
     keyboard_final.add_button("Поищем ещё!", VkKeyboardColor.POSITIVE)
     keyboard_final.add_line()
+    keyboard_final.add_button("Покажи моих Избранных", VkKeyboardColor.PRIMARY)
+    keyboard_final.add_line()
     keyboard_final.add_button("Заканчивай", VkKeyboardColor.NEGATIVE)
     return keyboard_final
