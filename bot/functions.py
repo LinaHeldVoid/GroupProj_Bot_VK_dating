@@ -1,12 +1,13 @@
 import random
 from vk_api.longpoll import VkLongPoll, VkEventType
+
 from bot.keyboard import *
 from db.db_functions import *
 
 
 def kirillic_symbols(text):
     letters_permitted = (
-        "АБВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя"
+        "АБВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя -"
     )
     kirillic = list(letters_permitted)
     example = list(text)
@@ -204,7 +205,7 @@ def generate_candidate_message(cur):
     return f"{fname} {lname}\n<img src='{photo_link}'/>\n{link}"
 
 
-def discuss_candidates(session, user_id):
+async def discuss_candidates(session, user_id):
     conn = psycopg2.connect(
         host="localhost", user="postgres", password="postgres", database="vkinder"
     )

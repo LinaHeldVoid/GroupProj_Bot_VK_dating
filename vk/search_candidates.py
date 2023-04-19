@@ -5,7 +5,7 @@ import psycopg2
 import vk_api
 
 
-def search_partner_list(session, user_id, age_low, age_high, gender, country, city):
+async def search_partner_list(session, user_id, age_low, age_high, gender, country, city):
     conn = psycopg2.connect(
         host="localhost", user="postgres", password="postgres", database="vkinder"
     )
