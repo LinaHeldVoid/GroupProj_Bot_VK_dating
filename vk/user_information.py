@@ -38,12 +38,12 @@ class VK:
         }
         response = requests.get(url, params=params)
         link = f"https://vk.com/{self.id}"
-        print(link)
+        # print(link)
         return json.loads(response.text)
 
     def data_for_db(self):
         data = self.users_info()
-        pprint(data)
+        # pprint(data)
         name = data["response"][0]["first_name"]
         second_name = data["response"][0]["last_name"]
         link = data["response"][0]["domain"]
@@ -57,7 +57,7 @@ class VK:
             likes_counter.append(likes)
             i += 1
         likes_leaders = nlargest(3, likes_counter)
-        print(likes_leaders)
+        # print(likes_leaders)
 
         j = 0
         new_data = []
@@ -73,15 +73,14 @@ class VK:
             for pics in new_data[k]["sizes"]:
                 if max_height < pics["height"]:
                     max_height = pics["height"]
-            print(max_height)
+            # print(max_height)
             for pic in new_data[k]["sizes"]:
-                print(pic)
+                # print(pic)
                 if pic["height"] == max_height:
-                    print(max_height)
+                    # print(max_height)
                     link_list.append(pic["url"])
             k += 1
         return link_list, name, second_name, super_link
 
-
-# vk = VK()
-# pprint(vk.data_for_db())
+vk = VK()
+pprint(vk.data_for_db())
