@@ -1,38 +1,36 @@
-from pprint import pprint
-
 from data.token_list import access_token as token
 import psycopg2
 import vk_api
+from vk.user_information import take_user_info
 
 
-async def search_partner_list(session, user_id, age_low, age_high, gender, country, city):
+async def search_partner_list(session, user_id, age_low, age_high, gender):
     conn = psycopg2.connect(
         host="localhost", user="postgres", password="postgres", database="vkinder"
     )
     cur = conn.cursor()
-
     # Удаляем все записи из таблицы people_found / обнуляем таблицу перед новым поиском
-    cur.execute("DELETE FROM people_found")
-    conn.commit()
+    # cur.execute("DELETE FROM people_found")
+    # conn.commit()
 
     session = vk_api.VkApi(token=token)
     vk = session.get_api()
     age_low = age_low
     age_high = age_high
     gender_FM0 = gender
-    country = country
-    city = city
+    # country = country
+    # city = city
     sex = 1 if gender_FM0 == 1 else 2
     # Определяем город
-    city_id = vk.database.getCities(country_id=1, q=city)["items"][0]["id"]
-    pprint(city_id)
+    city_id = take_user_info(user_id)['city']
+        # vk.database.getCities(country_id=1, q=city)["items"][0]["id"]
+    # pprint(city_id)
     # Определяем возрастные ограничения для поиска
     age_from = age_low
     age_to = age_high
 
     # Получаем первые 50 id пользователей, удовлетворяющих нашим критериям
     users_search = vk.users.search(
-        country=1,
         city=city_id,
         sex=sex,
         age_from=age_from,

@@ -1,8 +1,8 @@
 import random
 from vk_api.longpoll import VkLongPoll, VkEventType
-
 from bot.keyboard import *
 from db.db_functions import *
+from vk.user_information import take_user_info
 
 
 def kirillic_symbols(text):
@@ -21,7 +21,7 @@ def write_msg(session, user_id, message, keyboard=None):
     params = {
         "user_id": user_id,
         "message": message,
-        "random_id": random.randrange(10**7),
+        "random_id": random.randrange(10 ** 7),
     }
     if keyboard is not None:
         params["keyboard"] = keyboard.get_keyboard()
@@ -38,11 +38,14 @@ def wrong_input(session, user_id):
 def greetings(session, user_id):
     for event in VkLongPoll(session).listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+            who = take_user_info(user_id)
             write_msg(
                 session,
                 user_id,
-                "Добро пожаловать в наш бот для знакомств! "
-                "Хочешь встретить свою судьбу?;)",
+                f"Привет, {who['first_name']}! Добро пожаловать в наш бот для знакомств.\n"
+                f"Исходя из данных о тебе: город: {who['city_title']}, возраст: {who['age']} лет\n"
+                f"Подберём тебе пару.\n\n"
+                f"Жми кнопку Вперёд и начнём",
                 keyboard_hello_generate(),
             )
             return
@@ -136,7 +139,7 @@ def age_check_high(session, user_id, age_low):
             else:
                 write_msg(session, user_id, "Пожалуйста, введи ответ.")
 
-
+#не использую
 def country_input(session, user_id):
     write_msg(
         session,
@@ -161,6 +164,7 @@ def country_input(session, user_id):
                 write_msg(session, user_id, "Пожалуйста, введите ответ.")
 
 
+#не использую
 def city_input(session, user_id):
     write_msg(
         session, user_id, "Теперь укажите желаемый город", keyboard_city_generate()
@@ -180,6 +184,7 @@ def city_input(session, user_id):
                     write_msg(session, user_id, "Пожалуйста, введи ответ кириллицей.")
             else:
                 write_msg(session, user_id, "Пожалуйста, введи ответ.")
+
 
 
 """ЗДЕСЬ АКТИВИРУЕТСЯ ПОИСК (см. VK.search_candidates)"""
