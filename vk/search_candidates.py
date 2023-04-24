@@ -12,8 +12,10 @@ async def search_partner_list(session, user_id, age_low, age_high, gender):
     )
     cur = conn.cursor()
     # Удаляем все записи из таблицы people_found / обнуляем таблицу перед новым поиском
-    # cur.execute("DELETE FROM people_found")
-    # conn.commit()
+    cur.execute("DELETE FROM people_found")
+    cur.execute("DELETE FROM favorites")
+    cur.execute("DELETE FROM black_list")
+    conn.commit()
 
     session = vk_api.VkApi(token=token)
     vk = session.get_api()
@@ -38,7 +40,7 @@ async def search_partner_list(session, user_id, age_low, age_high, gender):
         age_from=age_from,
         age_to=age_to,
         fields="id",
-        count=50,
+        count=5,
     )
 
     # Список id пользователей

@@ -5,6 +5,11 @@ from bot.keyboard import *
 from db.db_functions import *
 from vk.user_information import take_user_info
 
+from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
+from vk_api.utils import get_random_id
+
+
+
 
 def kirillic_symbols(text):
     letters_permitted = (
@@ -200,16 +205,31 @@ def random_person(candidate_list):
 """ВЫВОДИТСЯ РАНДОМНЫЙ ЧЕЛОВЕК ИЗ ВЫБОРКИ"""
 
 
-def generate_candidate_message(cur):
-    cur.execute(
-        "SELECT first_name, last_name, photo, vk_link FROM people_found ORDER BY random() LIMIT 1"
-    )
+def get_random_candidate(cur):
+    cur.execute("""
+            SELECT p.first_name, p.last_name, p.photo, p.vk_link 
+            FROM people_found p 
+            LEFT JOIN black_list b ON p.black_list_id = b.black_list_id 
+            WHERE b.black_list_id IS NULL 
+            ORDER BY random() LIMIT 1
+        """)
     candidate_data = cur.fetchone()
     fname = candidate_data[0]
     lname = candidate_data[1]
-    photo_link = f"*{candidate_data[2]}*"
+    photo = candidate_data[2]
     link = candidate_data[3]
-    return f"{fname} {lname}\n{photo_link}\n\n{link}"
+    return fname, lname, photo, link
+
+
+def get_people_from_favorites(cur):
+    cur.execute("""
+        SELECT p.*
+        FROM people_found p
+        JOIN favorites f ON p.favorit_id = f.favorit_id;
+    """)
+    result = cur.fetchall()
+    message = "\n".join([str(row) for row in result])
+    return message
 
 
 async def discuss_candidates(session, user_id):
@@ -218,7 +238,8 @@ async def discuss_candidates(session, user_id):
         host="localhost", user="postgres", password="postgres", database="vkinder"
     )
     cur = conn.cursor()
-    message = generate_candidate_message(cur)
+    fname, lname, photo, link = get_random_candidate(cur)
+    message = f"{fname} {lname}\n{photo}\n\n{link}"
     write_msg(
         session,
         user_id,
@@ -230,13 +251,10 @@ async def discuss_candidates(session, user_id):
             text = event.text
             if text == "Да! Добавь в Избранное":
                 bot_satisfied_reply()
-                save_to_favorites(cur, conn, message)
+                save_to_favorites(cur, conn, fname, lname, link)
                 bot_next_reply()
-                cur.execute(
-                    "DELETE FROM people_found WHERE vk_link = %s", (message,)
-                )
-                conn.commit()
-                message = generate_candidate_message(cur)
+                fname, lname, photo, link = get_random_candidate(cur)
+                message = f"{fname} {lname}\n{photo}\n\n{link}"
                 write_msg(
                     session,
                     user_id,
@@ -246,11 +264,8 @@ async def discuss_candidates(session, user_id):
             elif text == "Давай посмотрим ещё":
                 bot_neutral_reply()
                 bot_next_reply()
-                cur.execute(
-                    "DELETE FROM people_found WHERE vk_link = %s", (message,)
-                )
-                conn.commit()
-                message = generate_candidate_message(cur)
+                fname, lname, photo, link = get_random_candidate(cur)
+                message = f"{fname} {lname}\n{photo}\n\n{link}"
                 write_msg(
                     session,
                     user_id,
@@ -259,13 +274,10 @@ async def discuss_candidates(session, user_id):
                 )
             elif text == "Нет. Больше не показывай":
                 bot_upset_reply()
-                save_to_black_list(cur, conn, message)
+                save_to_black_list(cur, conn, fname, lname, link)
                 bot_next_reply()
-                cur.execute(
-                    "DELETE FROM people_found WHERE vk_link = %s", (message,)
-                )
-                conn.commit()
-                message = generate_candidate_message(cur)
+                fname, lname, photo, link = get_random_candidate(cur)
+                message = f"{fname} {lname}\n{photo}\n\n{link}"
                 write_msg(
                     session,
                     user_id,
@@ -279,6 +291,10 @@ async def discuss_candidates(session, user_id):
 
 
 def final_menu(session, user_id):
+    conn = psycopg2.connect(
+        host="localhost", user="postgres", password="postgres", database="vkinder"
+    )
+    cur = conn.cursor()
     write_msg(
         session,
         user_id,
@@ -293,7 +309,8 @@ def final_menu(session, user_id):
                 decision = 1
                 return decision
             elif text == "Покажи моих Избранных":
-                write_msg(session, user_id, "ЗДЕСЬ МОГЛИ БЫТЬ ВАШИ ИЗБРАННЫЕ)))")
+                message = get_people_from_favorites(cur)
+                write_msg(session, user_id, message)
 
                 '''Далее будет команда для вывода избранных'''
 

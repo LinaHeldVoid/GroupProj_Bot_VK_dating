@@ -19,7 +19,7 @@ def bot_body(session, user_id):
         gender = gender_choice(session, user_id)
         age_low = age_check_low(session, user_id)
         age_high = age_check_high(session, user_id, age_low)
-        drop_tables_data()
+        # drop_tables_data()
         # country = country_input(session, user_id)
         # city = city_input(session, user_id)
         asyncio.run(loop(session, user_id, age_low, age_high, gender))
