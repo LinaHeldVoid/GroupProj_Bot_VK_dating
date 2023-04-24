@@ -1,4 +1,5 @@
 import random
+import asyncio
 from vk_api.longpoll import VkLongPoll, VkEventType
 from bot.keyboard import *
 from db.db_functions import *
@@ -139,6 +140,7 @@ def age_check_high(session, user_id, age_low):
             else:
                 write_msg(session, user_id, "Пожалуйста, введи ответ.")
 
+
 #не использую
 def country_input(session, user_id):
     write_msg(
@@ -205,12 +207,13 @@ def generate_candidate_message(cur):
     candidate_data = cur.fetchone()
     fname = candidate_data[0]
     lname = candidate_data[1]
-    photo_link = candidate_data[2]
+    photo_link = f"*{candidate_data[2]}*"
     link = candidate_data[3]
     return f"{fname} {lname}\n{photo_link}\n\n{link}"
 
 
 async def discuss_candidates(session, user_id):
+    await asyncio.sleep(1)
     conn = psycopg2.connect(
         host="localhost", user="postgres", password="postgres", database="vkinder"
     )
@@ -227,7 +230,7 @@ async def discuss_candidates(session, user_id):
             text = event.text
             if text == "Да! Добавь в Избранное":
                 bot_satisfied_reply()
-                save_to_favorites()
+                save_to_favorites(cur, conn, message)
                 bot_next_reply()
                 cur.execute(
                     "DELETE FROM people_found WHERE vk_link = %s", (message,)
@@ -256,7 +259,7 @@ async def discuss_candidates(session, user_id):
                 )
             elif text == "Нет. Больше не показывай":
                 bot_upset_reply()
-                save_to_black_list()
+                save_to_black_list(cur, conn, message)
                 bot_next_reply()
                 cur.execute(
                     "DELETE FROM people_found WHERE vk_link = %s", (message,)

@@ -85,6 +85,7 @@ class VK:
 # vk = VK()
 # pprint(vk.data_for_db())
 
+
 def take_user_info(user_id):
     url_id_info = "https://api.vk.com/method/users.get"
     params_id_info = {

@@ -46,23 +46,25 @@ def create_table():
             print("Соединение с PostgreSQL закрыто")
 
 
+# Удаляем все записи из таблицы people_found / обнуляем таблицу перед новым поиском
 def drop_tables_data():
     conn = psycopg2.connect(
         host="localhost", user="postgres", password="postgres", database="vkinder"
     )
     cur = conn.cursor()
-    # Удаляем все записи из таблицы people_found / обнуляем таблицу перед новым поиском
     cur.execute("DELETE FROM people_found")
     conn.commit()
 
 
-def save_to_favorites():
-    pass
+def save_to_favorites(cur, conn, vk_link):
+    cur.execute("INSERT INTO favorites (vk_link) VALUES (%s)", (vk_link,))
+    conn.commit()
 
 
-def save_to_black_list():
-    pass
-
+def save_to_black_list(cur, conn, vk_link):
+    cur.execute("INSERT INTO black_list (vk_link) VALUES (%s)", (vk_link,))
+    cur.execute("DELETE FROM people_found WHERE vk_link = %s", (vk_link,))
+    conn.commit()
 
 def clear_db():
     pass

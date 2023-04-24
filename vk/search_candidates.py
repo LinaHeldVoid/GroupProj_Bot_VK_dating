@@ -94,4 +94,4 @@ async def search_partner_list(session, user_id, age_low, age_high, gender):
         )
     conn.commit()
 
-    return candidate_list
+    return candidate_list, f"Наполнение таблицы 'people_found' окончено"
