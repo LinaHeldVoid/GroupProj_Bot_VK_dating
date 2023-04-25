@@ -185,7 +185,6 @@ def get_people_from_favorites(cur):
 
 
 async def discuss_candidates(session, user_id):
-    await asyncio.sleep(1)
     conn = psycopg2.connect(
         host="localhost", user="postgres", password="postgres", database="vkinder"
     )

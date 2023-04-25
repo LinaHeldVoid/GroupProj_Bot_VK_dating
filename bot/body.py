@@ -4,11 +4,13 @@ from vk.search_candidates import search_partner_list
 
 
 async def loop(session, user_id, age_low, age_high, gender):
-    tasks = [
-        discuss_candidates(session, user_id),
-        search_partner_list(session, user_id, age_low, age_high, gender),
-    ]
-    await asyncio.gather(*tasks)
+    task_search = asyncio.create_task(
+        search_partner_list(session, user_id, age_low, age_high, gender)
+    )
+    task_discuss = asyncio.create_task(discuss_candidates(session, user_id))
+
+    await task_search
+    await task_discuss
 
 
 def bot_body(session, user_id):
