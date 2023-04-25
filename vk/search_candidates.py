@@ -6,12 +6,16 @@ from bot.functions import write_msg
 
 
 async def search_partner_list(session, user_id, age_low, age_high, gender):
-    write_msg(session, user_id, f"Пожалуйста подождите осуществляю поиск. \nБип буп боп ╚═། ◑ ▃ ◑ །═╝")
+    write_msg(
+        session,
+        user_id,
+        f"Пожалуйста подождите осуществляю поиск. \nБип буп боп ╚═། ◑ ▃ ◑ །═╝",
+    )
     conn = psycopg2.connect(
         host="localhost", user="postgres", password="postgres", database="vkinder"
     )
     cur = conn.cursor()
-    # Удаляем все записи из таблицы people_found / обнуляем таблицу перед новым поиском
+    # Удаляем все записи из таблиц/ обнуляем таблицы перед новым поиском
     cur.execute("DELETE FROM people_found")
     cur.execute("DELETE FROM favorites")
     cur.execute("DELETE FROM black_list")
@@ -22,13 +26,9 @@ async def search_partner_list(session, user_id, age_low, age_high, gender):
     age_low = age_low
     age_high = age_high
     gender_FM0 = gender
-    # country = country
-    # city = city
     sex = 1 if gender_FM0 == 1 else 2
     # Определяем город
-    city_id = take_user_info(user_id)['city']
-        # vk.database.getCities(country_id=1, q=city)["items"][0]["id"]
-    # pprint(city_id)
+    city_id = take_user_info(user_id)["city"]
     # Определяем возрастные ограничения для поиска
     age_from = age_low
     age_to = age_high
@@ -40,7 +40,7 @@ async def search_partner_list(session, user_id, age_low, age_high, gender):
         age_from=age_from,
         age_to=age_to,
         fields="id",
-        count=5,
+        count=1000,
     )
 
     # Список id пользователей
@@ -96,4 +96,4 @@ async def search_partner_list(session, user_id, age_low, age_high, gender):
         )
     conn.commit()
 
-    return candidate_list, f"Наполнение таблицы 'people_found' окончено"
+    return candidate_list

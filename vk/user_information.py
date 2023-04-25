@@ -82,6 +82,7 @@ class VK:
             k += 1
         return link_list, name, second_name, super_link
 
+
 # vk = VK()
 # pprint(vk.data_for_db())
 
@@ -103,12 +104,13 @@ def take_user_info(user_id):
         "sex": data_id_info["sex"],
         "city": 1,
         "city_title": "Москва",
-        "age": None
+        "age": None,
     }
     if "bdate" in data_id_info:
         try:
             delta = datetime.datetime.today() - datetime.datetime.strptime(
-                data_id_info["bdate"], "%d.%m.%Y")
+                data_id_info["bdate"], "%d.%m.%Y"
+            )
             info["age"] = delta.days // 365
         except:
             info["age"] = None

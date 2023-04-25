@@ -3,7 +3,6 @@ import vk_api
 from data.token_list import bot_token, user_id
 
 
-
 session = vk_api.VkApi(token=bot_token)
 
 if __name__ == "__main__":

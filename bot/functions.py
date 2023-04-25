@@ -1,14 +1,10 @@
 import random
 import asyncio
+import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 from bot.keyboard import *
 from db.db_functions import *
 from vk.user_information import take_user_info
-
-from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
-from vk_api.utils import get_random_id
-
-
 
 
 def kirillic_symbols(text):
@@ -27,7 +23,7 @@ def write_msg(session, user_id, message, keyboard=None):
     params = {
         "user_id": user_id,
         "message": message,
-        "random_id": random.randrange(10 ** 7),
+        "random_id": random.randrange(10**7),
     }
     if keyboard is not None:
         params["keyboard"] = keyboard.get_keyboard()
@@ -146,54 +142,6 @@ def age_check_high(session, user_id, age_low):
                 write_msg(session, user_id, "Пожалуйста, введи ответ.")
 
 
-#не использую
-def country_input(session, user_id):
-    write_msg(
-        session,
-        user_id,
-        "Отлично! В какой стране ищете вашего человека?",
-        keyboard_country_generate(),
-    )
-    for event in VkLongPoll(session).listen():
-        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            text = event.text
-            if text is not None:
-                if kirillic_symbols(text):
-                    if text == "Страна не имеет значения":
-                        country = None
-                        return country
-                    else:
-                        country = text
-                        return country
-                else:
-                    write_msg(session, user_id, "Пожалуйста, введите ответ кириллицей.")
-            else:
-                write_msg(session, user_id, "Пожалуйста, введите ответ.")
-
-
-#не использую
-def city_input(session, user_id):
-    write_msg(
-        session, user_id, "Теперь укажите желаемый город", keyboard_city_generate()
-    )
-    for event in VkLongPoll(session).listen():
-        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            text = event.text
-            if text is not None:
-                if kirillic_symbols(text):
-                    if text == "Город не имеет значения":
-                        city = 0
-                        return city
-                    else:
-                        city = text
-                        return city
-                else:
-                    write_msg(session, user_id, "Пожалуйста, введи ответ кириллицей.")
-            else:
-                write_msg(session, user_id, "Пожалуйста, введи ответ.")
-
-
-
 """ЗДЕСЬ АКТИВИРУЕТСЯ ПОИСК (см. VK.search_candidates)"""
 
 
@@ -206,13 +154,15 @@ def random_person(candidate_list):
 
 
 def get_random_candidate(cur):
-    cur.execute("""
+    cur.execute(
+        """
             SELECT p.first_name, p.last_name, p.photo, p.vk_link 
             FROM people_found p 
             LEFT JOIN black_list b ON p.black_list_id = b.black_list_id 
             WHERE b.black_list_id IS NULL 
             ORDER BY random() LIMIT 1
-        """)
+        """
+    )
     candidate_data = cur.fetchone()
     fname = candidate_data[0]
     lname = candidate_data[1]
@@ -222,11 +172,13 @@ def get_random_candidate(cur):
 
 
 def get_people_from_favorites(cur):
-    cur.execute("""
+    cur.execute(
+        """
         SELECT p.*
         FROM people_found p
         JOIN favorites f ON p.favorit_id = f.favorit_id;
-    """)
+    """
+    )
     result = cur.fetchall()
     message = "\n".join([str(row) for row in result])
     return message
@@ -250,9 +202,7 @@ async def discuss_candidates(session, user_id):
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
             text = event.text
             if text == "Да! Добавь в Избранное":
-                bot_satisfied_reply()
                 save_to_favorites(cur, conn, fname, lname, link)
-                bot_next_reply()
                 fname, lname, photo, link = get_random_candidate(cur)
                 message = f"{fname} {lname}\n{photo}\n\n{link}"
                 write_msg(
@@ -262,8 +212,6 @@ async def discuss_candidates(session, user_id):
                     keyboard_discussion_generate(),
                 )
             elif text == "Давай посмотрим ещё":
-                bot_neutral_reply()
-                bot_next_reply()
                 fname, lname, photo, link = get_random_candidate(cur)
                 message = f"{fname} {lname}\n{photo}\n\n{link}"
                 write_msg(
@@ -273,9 +221,7 @@ async def discuss_candidates(session, user_id):
                     keyboard_discussion_generate(),
                 )
             elif text == "Нет. Больше не показывай":
-                bot_upset_reply()
                 save_to_black_list(cur, conn, fname, lname, link)
-                bot_next_reply()
                 fname, lname, photo, link = get_random_candidate(cur)
                 message = f"{fname} {lname}\n{photo}\n\n{link}"
                 write_msg(
@@ -309,11 +255,15 @@ def final_menu(session, user_id):
                 decision = 1
                 return decision
             elif text == "Покажи моих Избранных":
-                message = get_people_from_favorites(cur)
-                write_msg(session, user_id, message)
-
-                '''Далее будет команда для вывода избранных'''
-
+                try:
+                    message = get_people_from_favorites(cur)
+                    write_msg(session, user_id, message)
+                except vk_api.exceptions.ApiError as e:
+                    if e.code == 100:
+                        write_msg(session, user_id, "Список 'Избранных' пуст.")
+                        continue
+                    else:
+                        raise e
             elif text == "Заканчивай":
                 write_msg(
                     session,
