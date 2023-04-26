@@ -36,17 +36,22 @@ def wrong_input(session, user_id):
 def greetings(session, user_id):
     for event in VkLongPoll(session).listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            who = take_user_info(user_id)
-            write_msg(
-                session,
-                user_id,
-                f"Привет, {who['first_name']}! Добро пожаловать в наш бот для знакомств.\n"
-                f"Исходя из данных о тебе: город: {who['city_title']}, возраст: {who['age']} лет\n"
-                f"Подберём тебе пару.\n\n"
-                f"Жми кнопку Вперёд и начнём",
-                keyboard_hello_generate(),
-            )
-            return
+            try:
+                who = take_user_info(user_id)
+            except KeyError:
+                print("ОШИБКА: Ваш 'access_token' устарел, пожалуйста обновите его")
+                who = None
+            if who:
+                write_msg(
+                    session,
+                    user_id,
+                    f"Привет, {who['first_name']}! Добро пожаловать в наш бот для знакомств.\n"
+                    f"Исходя из данных о тебе: город: {who['city_title']}, возраст: {who['age']} лет\n"
+                    f"Подберём тебе пару.\n\n"
+                    f"Жми кнопку Вперёд и начнём",
+                    keyboard_hello_generate(),
+                )
+                return
 
 
 def start_bot(session, user_id):
@@ -217,28 +222,16 @@ async def discuss_candidates(session, user_id):
             text = event.text
             if text == "Да! Добавь в Избранное":
                 save_to_favorites(cur, conn, fname, lname, link)
-                write_msg(
-                    session,
-                    user_id,
-                    f"Что думаешь об этом человеке?"
-                )
+                write_msg(session, user_id, f"Что думаешь об этом человеке?")
                 fname, lname, link = message_generator(session, user_id, cur)
             elif text == "Давай посмотрим ещё":
                 save_to_favorites(cur, conn, fname, lname, link)
-                write_msg(
-                    session,
-                    user_id,
-                    f"Что думаешь об этом человеке?"
-                )
+                write_msg(session, user_id, f"Что думаешь об этом человеке?")
                 fname, lname, link = message_generator(session, user_id, cur)
             elif text == "Нет. Больше не показывай":
                 save_to_black_list(cur, conn, fname, lname, link)
                 save_to_favorites(cur, conn, fname, lname, link)
-                write_msg(
-                    session,
-                    user_id,
-                    f"Что думаешь об этом человеке?"
-                )
+                write_msg(session, user_id, f"Что думаешь об этом человеке?")
                 fname, lname, link = message_generator(session, user_id, cur)
             elif text == "Стоп":
                 return

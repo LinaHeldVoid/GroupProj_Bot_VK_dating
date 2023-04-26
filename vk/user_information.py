@@ -22,9 +22,7 @@ class VK:
 
         return response.json()
 
-    def get_photos_data(
-        self, owner_id, offset=0
-    ):  # получение информации о фото из ВК
+    def get_photos_data(self, owner_id, offset=0):  # получение информации о фото из ВК
         self.id = owner_id
         url = "https://api.vk.com/method/photos.get"
         params = {

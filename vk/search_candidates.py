@@ -75,7 +75,7 @@ async def search_partner_list(session, user_id, age_low, age_high, gender):
         candidate = {
             "id": user["id"],
             "first_name": user["first_name"],
-            "last_name": user["last_name"]
+            "last_name": user["last_name"],
         }
         candidate_list.append(candidate)
 
