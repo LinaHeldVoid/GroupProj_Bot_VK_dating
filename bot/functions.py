@@ -185,7 +185,7 @@ def get_people_from_favorites(cur):
     """
     )
     result = cur.fetchall()
-    message = "\n".join([str(row) for row in result])
+    message = "\n".join([f"{row[1]} {row[2]} {row[5]}" for row in result])
     return message
 
 
