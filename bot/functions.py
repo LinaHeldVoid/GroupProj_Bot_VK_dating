@@ -1,5 +1,4 @@
 import random
-import asyncio
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 from bot.keyboard import *
@@ -27,9 +26,6 @@ def write_msg(session, user_id, message, keyboard=None):
     }
     if keyboard is not None:
         params["keyboard"] = keyboard.get_keyboard()
-    else:
-        params = params
-
     session.method("messages.send", params)
 
 
