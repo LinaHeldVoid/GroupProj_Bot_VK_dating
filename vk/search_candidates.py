@@ -41,7 +41,7 @@ async def search_partner_list(session, user_id, age_low, age_high, gender):
         age_from=age_from,
         age_to=age_to,
         fields="id",
-        count=10,
+        count=50,
     )
 
     # Список id пользователей
