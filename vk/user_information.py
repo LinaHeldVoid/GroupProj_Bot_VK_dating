@@ -40,33 +40,40 @@ class VK:
 
     def data_for_db(self, user_id):
         data = self.get_photos_data(user_id)
-        count_foto = data["response"]["count"]
-        i = 0
-        likes_counter = []  # находим самые популярные фото (по лайкам)
-        while i < count_foto:
-            likes = data["response"]["items"][i]["likes"]["count"]
-            likes_counter.append(likes)
-            i += 1
-        likes_leaders = nlargest(3, likes_counter)
+        if data is not None:
+            count_foto = data["response"]["count"]
+            i = 0
+            likes_counter = []  # находим самые популярные фото (по лайкам)
+            while i < count_foto:
+                try:
+                    likes = data["response"]["items"][i]["likes"]["count"]
+                    likes_counter.append(likes)
+                    i += 1
+                except IndexError:
+                    link_list = None
+                    return link_list
+            likes_leaders = nlargest(3, likes_counter)
 
-        j = 0
-        new_data = []
-        while j < count_foto:
-            if data["response"]["items"][j]["likes"]["count"] in likes_leaders:
-                new_data.append(data["response"]["items"][j])
-            j += 1
+            j = 0
+            new_data = []
+            while j < count_foto:
+                if data["response"]["items"][j]["likes"]["count"] in likes_leaders:
+                    new_data.append(data["response"]["items"][j])
+                j += 1
 
-        link_list = []
-        k = 0
-        while k < len(likes_leaders):  # отбираем версии фото лучшего качества
-            max_height = 0
-            for pics in new_data[k]["sizes"]:
-                if max_height < pics["height"]:
-                    max_height = pics["height"]
-            for pic in new_data[k]["sizes"]:
-                if pic["height"] == max_height:
-                    link_list.append(pic["url"])
-            k += 1
+            link_list = []
+            k = 0
+            while k < len(likes_leaders):  # отбираем версии фото лучшего качества
+                max_height = 0
+                for pics in new_data[k]["sizes"]:
+                    if max_height < pics["height"]:
+                        max_height = pics["height"]
+                for pic in new_data[k]["sizes"]:
+                    if pic["height"] == max_height:
+                        link_list.append(pic["url"])
+                k += 1
+        else:
+            link_list = None
         return link_list
 
 

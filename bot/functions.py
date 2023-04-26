@@ -192,13 +192,16 @@ def get_people_from_favorites(cur):
 def message_generator(session, user_id, cur):
     fname, lname, photo, link = get_random_candidate(cur)
     message = f"{fname} {lname}\n\n{link}"
-    for pics in photo:
-        write_msg(
-            session,
-            user_id,
-            message=None,
-            attachment=pics,
-        )
+    if photo:
+        for pics in photo:
+            write_msg(
+                session,
+                user_id,
+                message=None,
+                attachment=pics,
+            )
+    else:
+        write_msg(session, user_id, f"К сожалению, у данного пользователя нет фото.\n\n")
     write_msg(
         session,
         user_id,
@@ -217,23 +220,23 @@ async def discuss_candidates(session, user_id):
     write_msg(
         session,
         user_id,
-        f"Начнём! Что думаешь об этом человеке?",
+        "Начнём! Что думаешь об этом человеке?",
     )
     for event in VkLongPoll(session).listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
             text = event.text
             if text == "Да! Добавь в Избранное":
                 save_to_favorites(cur, conn, fname, lname, link)
-                write_msg(session, user_id, f"Что думаешь об этом человеке?")
+                write_msg(session, user_id, "Что думаешь об этом человеке?")
                 fname, lname, link = message_generator(session, user_id, cur)
             elif text == "Давай посмотрим ещё":
                 save_to_favorites(cur, conn, fname, lname, link)
-                write_msg(session, user_id, f"Что думаешь об этом человеке?")
+                write_msg(session, user_id, "Что думаешь об этом человеке?")
                 fname, lname, link = message_generator(session, user_id, cur)
             elif text == "Нет. Больше не показывай":
                 save_to_black_list(cur, conn, fname, lname, link)
                 save_to_favorites(cur, conn, fname, lname, link)
-                write_msg(session, user_id, f"Что думаешь об этом человеке?")
+                write_msg(session, user_id, "Что думаешь об этом человеке?")
                 fname, lname, link = message_generator(session, user_id, cur)
             elif text == "Стоп":
                 return
