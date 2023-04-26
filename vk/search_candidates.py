@@ -10,7 +10,7 @@ async def search_partner_list(session, user_id, age_low, age_high, gender):
     write_msg(
         session,
         user_id,
-        f"Пожалуйста подождите осуществляю поиск. \nБип буп боп ╚═། ◑ ▃ ◑ །═╝",
+        f"Пожалуйста, подождите - осуществляю поиск. \nБип буп боп ╚═། ◑ ▃ ◑ །═╝",
     )
     conn = psycopg2.connect(
         host="localhost", user="postgres", password="postgres", database="vkinder"
