@@ -1,1 +1,1 @@
-__all__ = ["body", "functions", "keyboard", "vk"]
+__all__ = ["body", "functions", "keyboard"]
