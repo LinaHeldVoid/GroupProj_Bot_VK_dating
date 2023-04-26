@@ -14,6 +14,7 @@ async def loop(session, user_id, age_low, age_high, gender):
 
 
 def bot_body(session, user_id):
+    print('Программа готова к работе!')
     greetings(session, user_id)
     while True:
         start_bot(session, user_id)

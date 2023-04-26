@@ -4,7 +4,7 @@ import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 from bot.keyboard import *
 from db.db_functions import *
-from vk.user_information import take_user_info
+from vk.user_information import take_user_info, VK
 
 
 def kirillic_symbols(text):
@@ -156,7 +156,7 @@ def random_person(candidate_list):
 def get_random_candidate(cur):
     cur.execute(
         """
-            SELECT p.first_name, p.last_name, p.photo, p.vk_link 
+            SELECT p.first_name, p.last_name, p.vk_id, p.vk_link 
             FROM people_found p 
             LEFT JOIN black_list b ON p.black_list_id = b.black_list_id 
             WHERE b.black_list_id IS NULL 
@@ -166,9 +166,11 @@ def get_random_candidate(cur):
     candidate_data = cur.fetchone()
     fname = candidate_data[0]
     lname = candidate_data[1]
-    photo = candidate_data[2]
+    vk_id = candidate_data[2]
     link = candidate_data[3]
-    return fname, lname, photo, link
+    vk = VK()
+    photos = vk.data_for_db(vk_id)
+    return fname, lname, photos, link
 
 
 def get_people_from_favorites(cur):
@@ -184,51 +186,64 @@ def get_people_from_favorites(cur):
     return message
 
 
+def message_generator(session, user_id, cur):
+    fname, lname, photo, link = get_random_candidate(cur)
+    message = f"{fname} {lname}\n\n{link}"
+    for pics in photo:
+        write_msg(
+            session,
+            user_id,
+            f"\n{pics}",
+        )
+        print(pics)
+    write_msg(
+        session,
+        user_id,
+        f"\n{message}",
+        keyboard_discussion_generate(),
+    )
+    return fname, lname, link
+
+
 async def discuss_candidates(session, user_id):
     conn = psycopg2.connect(
         host="localhost", user="postgres", password="postgres", database="vkinder"
     )
     cur = conn.cursor()
-    fname, lname, photo, link = get_random_candidate(cur)
-    message = f"{fname} {lname}\n{photo}\n\n{link}"
+    fname, lname, link = message_generator(session, user_id, cur)
     write_msg(
         session,
         user_id,
-        f"Начнём! Что думаешь об этом человеке?\n{message}",
-        keyboard_discussion_generate(),
+        f"Начнём! Что думаешь об этом человеке?",
     )
     for event in VkLongPoll(session).listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
             text = event.text
             if text == "Да! Добавь в Избранное":
                 save_to_favorites(cur, conn, fname, lname, link)
-                fname, lname, photo, link = get_random_candidate(cur)
-                message = f"{fname} {lname}\n{photo}\n\n{link}"
                 write_msg(
                     session,
                     user_id,
-                    f"Что думаешь об этом человеке?\n{message}",
-                    keyboard_discussion_generate(),
+                    f"Что думаешь об этом человеке?"
                 )
+                fname, lname, link = message_generator(session, user_id, cur)
             elif text == "Давай посмотрим ещё":
-                fname, lname, photo, link = get_random_candidate(cur)
-                message = f"{fname} {lname}\n{photo}\n\n{link}"
+                save_to_favorites(cur, conn, fname, lname, link)
                 write_msg(
                     session,
                     user_id,
-                    f"Что думаешь об этом человеке?\n{message}",
-                    keyboard_discussion_generate(),
+                    f"Что думаешь об этом человеке?"
                 )
+                fname, lname, link = message_generator(session, user_id, cur)
             elif text == "Нет. Больше не показывай":
                 save_to_black_list(cur, conn, fname, lname, link)
-                fname, lname, photo, link = get_random_candidate(cur)
-                message = f"{fname} {lname}\n{photo}\n\n{link}"
+                save_to_favorites(cur, conn, fname, lname, link)
                 write_msg(
                     session,
                     user_id,
-                    f"Что думаешь об этом человеке?\n{message}",
-                    keyboard_discussion_generate(),
+                    f"Что думаешь об этом человеке?"
                 )
+                fname, lname, link = message_generator(session, user_id, cur)
             elif text == "Стоп":
                 return
             else:

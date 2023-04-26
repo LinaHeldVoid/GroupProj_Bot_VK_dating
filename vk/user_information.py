@@ -4,6 +4,8 @@ import json
 from data.token_list import access_token, user_id
 import datetime
 
+from pprint import pprint
+
 
 class VK:
     def __init__(self, version="5.131"):
@@ -21,10 +23,9 @@ class VK:
         return response.json()
 
     def get_photos_data(
-        self, owner_id, token, offset=0
+        self, owner_id, offset=0
     ):  # получение информации о фото из ВК
         self.id = owner_id
-        self.token = token
         url = "https://api.vk.com/method/photos.get"
         params = {
             "owner_id": self.id,
@@ -39,16 +40,11 @@ class VK:
         response = requests.get(url, params=params)
         link = f"https://vk.com/{self.id}"
         # print(link)
+        pprint(response)
         return json.loads(response.text)
 
-    def data_for_db(self):
-        data = self.users_info()
-        # pprint(data)
-        name = data["response"][0]["first_name"]
-        second_name = data["response"][0]["last_name"]
-        link = data["response"][0]["domain"]
-        super_link = f"https://vk.com/{link}"
-        data = self.get_photos_data(self.id, self.token)
+    def data_for_db(self, user_id):
+        data = self.get_photos_data(user_id)
         count_foto = data["response"]["count"]
         i = 0
         likes_counter = []  # находим самые популярные фото (по лайкам)
@@ -57,7 +53,7 @@ class VK:
             likes_counter.append(likes)
             i += 1
         likes_leaders = nlargest(3, likes_counter)
-        # print(likes_leaders)
+        print(likes_leaders)
 
         j = 0
         new_data = []
@@ -80,7 +76,7 @@ class VK:
                     # print(max_height)
                     link_list.append(pic["url"])
             k += 1
-        return link_list, name, second_name, super_link
+        return link_list
 
 
 # vk = VK()

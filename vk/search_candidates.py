@@ -1,7 +1,8 @@
 from data.token_list import access_token as token
+
 import psycopg2
 import vk_api
-from vk.user_information import take_user_info
+from vk.user_information import take_user_info, VK
 from bot.functions import write_msg
 
 
@@ -40,7 +41,7 @@ async def search_partner_list(session, user_id, age_low, age_high, gender):
         age_from=age_from,
         age_to=age_to,
         fields="id",
-        count=1000,
+        count=10,
     )
 
     # Список id пользователей
@@ -51,7 +52,7 @@ async def search_partner_list(session, user_id, age_low, age_high, gender):
 
     for user_id in users_ids:
         try:
-            photos_search = vk.photos.get(owner_id=user_id, album_id="profile", count=1)
+            photos_search = vk.photos.get(owner_id=user_id, album_id="profile", count=3)
             if photos_search["count"] > 0:
                 users_with_photos_ids.append(user_id)
         except vk_api.exceptions.ApiError as e:
@@ -74,8 +75,7 @@ async def search_partner_list(session, user_id, age_low, age_high, gender):
         candidate = {
             "id": user["id"],
             "first_name": user["first_name"],
-            "last_name": user["last_name"],
-            "photo": user["photo_max_orig"],
+            "last_name": user["last_name"]
         }
         candidate_list.append(candidate)
 
@@ -83,13 +83,12 @@ async def search_partner_list(session, user_id, age_low, age_high, gender):
     for candidate in candidate_list:
         cur.execute(
             """
-            INSERT INTO people_found (first_name, last_name, photo, vk_id, vk_link)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO people_found (first_name, last_name, vk_id, vk_link)
+            VALUES (%s, %s, %s, %s)
             """,
             (
                 candidate["first_name"],
                 candidate["last_name"],
-                f'{candidate["photo"]}',
                 candidate["id"],
                 f"https://vk.com/id{candidate['id']}",
             ),
