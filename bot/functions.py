@@ -18,7 +18,7 @@ def kirillic_symbols(text):
     return True
 
 
-def write_msg(session, user_id, message, keyboard=None):
+def write_msg(session, user_id, message, keyboard=None, attachment=None):
     params = {
         "user_id": user_id,
         "message": message,
@@ -26,6 +26,8 @@ def write_msg(session, user_id, message, keyboard=None):
     }
     if keyboard is not None:
         params["keyboard"] = keyboard.get_keyboard()
+    if attachment is not None:
+        params["attachment"] = attachment
     session.method("messages.send", params)
 
 
@@ -194,7 +196,8 @@ def message_generator(session, user_id, cur):
         write_msg(
             session,
             user_id,
-            f"\n{pics}",
+            message=None,
+            attachment=pics,
         )
     write_msg(
         session,
