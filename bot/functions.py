@@ -196,7 +196,6 @@ def message_generator(session, user_id, cur):
             user_id,
             f"\n{pics}",
         )
-        print(pics)
     write_msg(
         session,
         user_id,
